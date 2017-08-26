@@ -11,11 +11,10 @@ var dbpath = "mongodb://localhost/myblogapp";
 
 db = mongoose.connect(dbpath);
 
-mongoose.connection.once('open',function(){
-	
+mongoose.connection.once('open',function(){	
 	console.log(" database connection open success.. ");
-	
 });
+
 
 //include the model file
 var Blog = require('./blogModel.js');
@@ -40,21 +39,7 @@ app.get('/blogs',function(req, res){
 	})
 })
 
-//get particular Blogs by title
-app.get('/blogs/:title',function(req, res){
-	blogModel.find(function(err,result){
-		var ByTitle = result.filter(function (result) {
-		  return result.title === req.params.title;
-		});
 
-		if(err){
-			res.send(err);
-
-		} else {
-			res.send(ByTitle);
-		}
-	})
-})
 //get particular Blogs by id
 app.get('/blogs/:id',function(req, res){
 	blogModel.findOne({'_id':req.params.id},function(err,result){
@@ -70,14 +55,14 @@ app.get('/blogs/:id',function(req, res){
 app.post('/blogs/create',function(req, res){
 	var newBlog = new blogModel({
 		title : req.body.title,
-		Subtitle : req.body.subtitle,
+		Subtitle : req.body.Subtitle,
 		blogbody : req.body.blogbody
 		
 	});
 	var allTags = (req.body.tags != undefined && req.body.tags != null)? req.body.tags.split(","):'';
 	newBlog.tags = allTags;
 	
-	var lastmodifiedDate = (today != undefined && today != null)? today :'';  
+	var lastmodifiedDate = (today != undefined && today != null)? today :Date.now();  
 	newBlog.lastModified = lastmodifiedDate;
 	
 	var today = Date.now();
@@ -87,7 +72,7 @@ app.post('/blogs/create',function(req, res){
 	newBlog.authorInfo = authorInfo;
 	
 	
-	//now lets save the file.
+//now lets save the file.
 	newBlog.save(function(error){
 		if(error){
 			res.send(error);
@@ -122,14 +107,15 @@ app.delete('/blogs/:id/delete',function(req, res){
 })
 
 
+app.get('*',function(req,res,next){
+	next("Path not found..");	
+})
 
-
-
+app.use(function(err,req,res,next){
+	res.send(err.message);	
+})
 ///////End User Api///
 
-
-app.listen(3000,function(){
-	
-	console.log("Example app is listening on port no 3000..");
-	
+app.listen(3000,function(){	
+	console.log("Example app is listening on port no 3000..");	
 });
