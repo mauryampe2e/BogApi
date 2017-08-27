@@ -17,7 +17,7 @@ mongoose.connection.once('open',function(){
 
 
 //include the model file
-var Blog = require('./blogModel.js');
+var Blog = require('./models/blogModel.js');
 
 var blogModel = mongoose.model('Blog');
 
@@ -110,7 +110,7 @@ app.delete('/blogs/:id/delete',function(req, res){
 app.get('*',function(req,res,next){
 	next("Path not found..");	
 })
-
+//error handeler middleware
 app.use(function(err,req,res,next){
 	res.send(err.message);	
 })
